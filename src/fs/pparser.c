@@ -6,7 +6,7 @@
 #include "status.h"
 static int pathparser_path_valid_format(const char* filename)
 {
-    int len = strlen(filenam, PEACHOS_MAX_PATH);
+    int len = strnlen(filename, PEACHOS_MAX_PATH);
     return (len >= 3 && isdigit(filename[0]) && memcmp((void*)&filename[1], ":/", 2) == 0);
 }
 
@@ -24,7 +24,7 @@ static struct path_root* pathparser_create_root(int drive_number)
 {
     struct path_root* path_r = kzalloc(sizeof(struct path_root));
     path_r->drive_no = drive_number;
-    parth_r->first = 0;
+    path_r->first = 0;
     return path_r;
 }
 
@@ -50,12 +50,12 @@ static const char* pathparser_get_path_part(const char** path)
         kfree(result_path_part);
         result_path_part = 0;
     }
-    result result_path_part;
+    return result_path_part;
 }
 
 struct path_part* pathparser_parse_path_part(struct path_part* last_part, const char** path)
 {
-    const char* path_part_str = pathparser_get_path_part(part);
+    const char* path_part_str = pathparser_get_path_part(path);
     if(!path_part_str)
         return 0;
     struct path_part* part = kzalloc(sizeof(struct path_part));
@@ -65,11 +65,12 @@ struct path_part* pathparser_parse_path_part(struct path_part* last_part, const 
     {
         last_part->next = part;
     }
+    return part;
 }
 
 void pathparser_free(struct path_root* root)
 {
-    struct path_part* part = root->next;
+    struct path_part* part = root->first;
     while(part)
     {
         struct path_part* next_part = part->next;
@@ -93,7 +94,7 @@ struct path_root* pathparser_parse(const char* path, const char* current_directo
     path_root = pathparser_create_root(res);
     if(!path_root)
         goto out;
-    struct path_part* first_part = pathparser_parse_path_part(nullptr, &tmp_path);
+    struct path_part* first_part = pathparser_parse_path_part(NULL, &tmp_path);
     if(!first_part)
         goto out;
     path_root->first = first_part;

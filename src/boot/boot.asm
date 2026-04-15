@@ -3,12 +3,32 @@ BITS 16
 
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
-; fake BIOS Parameter Block to prevent code being overwritten
-_start:
-  jmp short start;
-  nop;
 
-times 33 db 0; fake 33 bytes
+jmp short start;
+nop;
+
+; FAT16 Header
+OEMIdentifier     db 'PEACHOS ' ; 8 bytes
+BytesPerSector    dw 0x200      ; 512 bytes per sector
+SectorsPerCluster db 0x80       ;
+ReservedSectors   dw 200        ; For the kernel
+FATCopies         db 0x02       ; 2 copies
+RootDirEntries    dw 0x40       ;
+NumSectors        dw 0x00       ; not using this
+MediaType         db 0xF8       ;
+SectorsPerFat     dw 0x100      ;
+SectorsPerTrack   dw 0x20       ;
+NumberOfHeads     dw 0x40       ;
+HiddenSectors     dd 0x00       ;
+SectorsBig        dd 0x773594   ;
+
+; Extended BPB (Dos 4.0)
+DriveNumber       db 0x80       ;
+WinNTBit          db 0x00       ;
+Signature         db 0x29       ;
+VolumeID          dd 0xD105     ;
+VolumeIDString    dw 'PEACHOS BOO' ; 11 bytes exactly!
+SystemIDString    dw 'FAT16   ' ; 8 byes
 
 start:
   jmp 0:step2; go to real code
