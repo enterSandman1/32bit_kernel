@@ -8,6 +8,7 @@
 #include "disk/disk.h"
 #include "fs/pparser.h"
 #include "string/string.h"
+#include "fs/file.h"
 #include "disk/streamer.h"
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0;
@@ -71,6 +72,7 @@ void kernel_main()
     char* str = "No! This is Patrick!";
     print(str);
     kheap_init();
+    fs_init(); // Filesystem
     disk_search_and_init();
     idt_init(); // initialise the IDT
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
@@ -79,9 +81,4 @@ void kernel_main()
 
     enable_interrupts();
 
-    struct disk_stream* stream = diskstreamer_new(0);
-    diskstreamer_seek(stream, 0x201);
-    unsigned char c = 0;
-    diskstreamer_read(stream, &c, 1);
-    while(1) {}
 }
