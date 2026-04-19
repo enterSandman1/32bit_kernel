@@ -12,6 +12,8 @@ struct disk
     PEACHOS_DISK_TYPE type;
     int sector_size;
     struct filesystem* filesystem;
+    int id;
+    void* fs_private;
 };
 void disk_search_and_init();
 struct disk* disk_get(int index);
